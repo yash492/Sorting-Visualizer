@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;}
+
+body {
+    background: #111;
+    color: #fff;
+}
+
+.container {
+    margin: 0 15px;
+    margin-top: 10px;
+}
+
+.btn {
+    color: #fff;
+    background: #111;
+    border: #007FFF 1px solid;
+    border-radius: 5px;
+    padding: 6px;
+    cursor: pointer;
+}
+
+.rotate {
+    -webkit-transform: rotateX(180deg);
+            transform: rotateX(180deg);
+  }
+
+.btn:hover {
+    color: #fff;
+    background-color: #007FFF;
+}
+
+.btn:focus {
+    outline: none;
+}
+
+.active {
+    color: #fff;
+    background-color: #007FFF;
+}
+
+.container h1 {
+    text-align: center;
+}
+
+.sorting-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    align-items: center;
+}
+
+.sorting-nav .right-align {
+    display: flex;
+}
+.sorting-nav .left-align {
+    display: flex;
+}
+
+.sorting-nav .left-align .btn {
+    margin-right: 15px;
+    color: #fff;
+    border: #29ac68 1px solid;
+}
+
+.sorting-nav .left-align .btn:hover {
+    color: #fff;
+    background-color:#29ac68;
+}
+
+.sorting-nav .right-align .btn:not(:last-child) {
+    margin: 0 15px;
+}
+
+.sorting-nav .right-align #quick-sort {
+    margin-left: 15px;
+}
+
+#bar-component {
+    margin-top: 4rem;
+    display: flex;
+    justify-content: center;
+}
+
+
+.bar {
+    border-left: #FFFF00 3px solid;
+    height: 300px;
+    margin-right: 4px;
+}
+
+.container .sorting-nav .left-align .label {
+    margin-right: 5px;
+    margin-top: 4px;
+}
+
+.container .sorting-nav .left-align #speed {
+    margin-right: 30px;
+}
