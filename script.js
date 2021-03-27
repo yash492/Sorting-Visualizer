@@ -30,10 +30,11 @@ function normalize(x, a = 30, b = 300, min = 1, max = 100) {
     return ((b - a) * ((x - min) / (max - min))) + a;
 }
 
-function createbar(normalizedHeight) {
+
+function createbar(normalizedHeight, color = "yellow") {
     const bar = document.createElement("div");
     bar.setAttribute('class', 'bar')
-    bar.style.borderLeft = "yellow 3px solid";
+    bar.style.borderLeft = `${color} 3px solid`;
     bar.style.marginRight = "4px";
     bar.style.height = normalizedHeight + "px";
     return bar;
@@ -41,7 +42,6 @@ function createbar(normalizedHeight) {
 
 function init(len) {
     while (barComponent.firstChild) barComponent.removeChild(barComponent.firstChild);
-
     for (let i = 1; i <= len; i++) {
         let random = Math.trunc(Math.random() * 100) + 1;
         array.push(random);
@@ -99,9 +99,22 @@ function toNumber(bar) {
     return Number(barCSS.substring(0, barCSS.length - 2));
 }
 
-// Changes the border color to green to indicate the sorted values
-function toGreen(bar) {
-    bar.style.borderColor = '#00FF00'
+// Changes the border color to color to indicate the sorted values
+function toColor(bar, color) {
+    bar.style.borderColor = color;
+}
+
+// Gets the array of heights of the bars
+function barsArray() {
+    const bars = document.getElementsByClassName('bar');
+    let barsArr = []
+    for (let i = 0; i < bars.length; i++) barsArr.push(toNumber(bars[i]));
+    return barsArr;
+}
+
+// timeout function for async function
+function timeout(ms = 600 - speedSlider.value) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /*-------------------------------- Helper Functions -------------------------------- */
@@ -128,15 +141,13 @@ async function bubbleSort() {
             if (val1 > val2)
                 swap(bars[j], bars[j + 1]);
 
-            await new Promise((resolve) =>
-                setTimeout(() => {
-                    resolve();
-                }, 600 - speedSlider.value)
-            );
+            await timeout();
+
 
             changeBackToYellow(bars[j], bars[j + 1]);
         }
-        toGreen(bars[k--]);
+        //Changes the borderColor to green
+        toColor(bars[k--], "#00FF00");
     }
 
     // Nothing to do with sorting
@@ -163,14 +174,10 @@ async function selectionSort() {
         }
         swap(bars[i], bars[minIndex]);
 
-        await new Promise((resolve) =>
-            setTimeout(() => {
-                resolve();
-            }, 600 - speedSlider.value)
-        );
+        await timeout();
 
         changeBackToYellow(bars[i], bars[minIndex]);
-        toGreen(bars[i]);
+        toColor(bars[i], "#00FF00");
     }
 
     // Nothing to do with sorting
@@ -180,13 +187,69 @@ async function selectionSort() {
 
 // Merge Sort
 function mergeSort() {
-    function merge(left, right) {
+    toggleButton(mergeSortBtn);
+    const arr = barsArray();
+    const bars = document.getElementsByClassName('bar');
+    console.log(arr);
+    const temp = [], seen = [];
+    let len = arr.length;
 
+    for (let i = 0; i < len; i++) {
+        temp.push(parseInt(0)); seen.push(parseInt(0));
     }
 
-    function sort(array) {
-
+    function draw(start, end) {
+        while (barComponent.firstChild) barComponent.removeChild(barComponent.firstChild);
+        for (let i = 0; i < len; i++) {
+            let bar = createbar(arr[i]);
+            barComponent.appendChild(bar);
+            if (seen[i] !== 0) {
+                toColor(bar, "#00FF00");
+            }
+        }
+        for (let i = start; i < end; i++) {
+            toColor(bars[i], "#FF0000");
+            seen[i] = 1;
+        }
     }
+
+    function merge(start, end) {
+        let mid = parseInt((start + end) / 2);
+        let start1 = start, start2 = mid + 1;
+        let end1 = mid, end2 = end;
+
+        disableEnableBarRange(isSorting = true);
+
+        let index = start;
+
+        while (start1 <= end1 && start2 <= end2) {
+            if (arr[start1] <= arr[start2]) temp[index++] = arr[start1++];
+            else temp[index++] = arr[start2++];
+        }
+        while (start1 <= end1) temp[index++] = arr[start1++];
+        while (start2 <= end2) temp[index++] = arr[start2++];
+
+        index = start;
+        while (index <= end) arr[index] = temp[index++];
+    }
+
+    async function sort(start, end) {
+        if (start < end) {
+            let mid = parseInt((start + end) / 2);
+            await sort(start, mid);
+            await sort(mid + 1, end);
+            merge(start, end);
+            draw(start, end);
+            await timeout();
+        }
+    }
+
+    async function execute() {
+        await sort(0, len - 1);
+        await draw();
+        disableEnableBarRange(isSorting = false);
+    }
+    execute();
 }
 
 // QuickSort
@@ -212,4 +275,6 @@ bubbleSortBtn.addEventListener('click', bubbleSort);
 //When the user clicks on Bubble Sort button
 selectionSortBtn.addEventListener('click', selectionSort);
 
-mergeSort();
+// mergeSort();
+mergeSortBtn.addEventListener('click', mergeSort);
+
