@@ -77,14 +77,16 @@ function disableEnableBarRange(isSorting) {
 /*-------------------------------- Helper Functions -------------------------------- */
 
 // Swap Values and changes border color to red
-function swap(bar1, bar2) {
+function swap(bar1, bar2, color = "#FF0000") {
     let val1 = toNumber(bar1);
     let val2 = toNumber(bar2);
 
     bar1.style.height = val2 + "px";
     bar2.style.height = val1 + "px";
-    bar1.style.borderColor = '#FF0000';
-    bar2.style.borderColor = '#FF0000';
+
+    bar1.style.borderColor = color;
+    bar2.style.borderColor = color;
+
 }
 
 // Changes the border color back to yellow after swapping
@@ -118,8 +120,6 @@ function timeout(ms = 600 - speedSlider.value) {
 }
 
 /*-------------------------------- --------------------------------------------------------- */
-
-
 
 // Bubble Sort
 async function bubbleSort() {
@@ -191,6 +191,9 @@ function mergeSort() {
     const arr = barsArray();
     const bars = document.getElementsByClassName('bar');
     console.log(arr);
+    // Temp and seen arrays
+    // Temp arrays will be used in merge function as a buffer to store variables.
+    // 
     const temp = [], seen = [];
     let len = arr.length;
 
@@ -254,7 +257,43 @@ function mergeSort() {
 
 // QuickSort
 function quickSort() {
+    const bars = document.getElementsByClassName('bar');
+    const len = bars.length;
+    toggleButton(quickSortBtn);
 
+
+    function colorRangeBar(bars, i, j, color) {
+        for (let k = i; k <= j; k++) {
+            toColor(bars[k], color);
+        }
+    }
+
+    async function partition(bars, low, high) {
+        disableEnableBarRange(isSorting = true);
+        let pivot = toNumber(bars[high]);
+        let i = low - 1;
+        for (let j = low; j < high; j++) {
+
+            if (toNumber(bars[j]) < pivot) {
+                swap(bars[++i], bars[j], "yellow");
+                colorRangeBar(bars, i, j, "red");
+                await timeout();
+                colorRangeBar(bars, i, j, "yellow");
+            }
+        }
+        swap(bars[i + 1], bars[high], "#00FF00");
+        return i + 1;
+    }
+
+    async function sort(bars, low, high) {
+        if (low < high) {
+            let part = await partition(bars, low, high);
+            await sort(bars, low, part - 1);
+            await sort(bars, part + 1, high);
+        }
+        disableEnableBarRange(isSorting = false);
+    }
+    sort(bars, 0, len - 1);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------ */
@@ -264,17 +303,22 @@ init(Number(barSlider.value))
 
 
 // All the event listeners are present here
+
 // When the user clicks the new-array button
 newArrayBtn.addEventListener('click', function () {
     location.reload();
 });
 
-//When the user clicks on Bubble Sort button
+// When the user clicks on Bubble Sort button
 bubbleSortBtn.addEventListener('click', bubbleSort);
 
-//When the user clicks on Bubble Sort button
+// When the user clicks on Bubble Sort button
 selectionSortBtn.addEventListener('click', selectionSort);
 
-// mergeSort();
+// When the user clicks on Merge Sort button
 mergeSortBtn.addEventListener('click', mergeSort);
+
+// When the user clicks on QuickSort button
+quickSortBtn.addEventListener('click', quickSort);
+
 
